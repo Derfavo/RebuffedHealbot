@@ -2,8 +2,9 @@
 ## Title: RebuffedHealbot
 ## Notes: Multi-class healing grid and recommendations for WoW 3.3.5a
 ## Author: Chronix
-## Version: 0.6.4
-## SavedVariables: ChronixHealDB
+## Version: 0.6.5
+## X-Release-Date: 20261101
+## SavedVariables: ChronixHealDB, RebuffedHealbotVersionDB
 locale.lua
 config.lua
 profiles.lua
@@ -13,5 +14,4 @@ minimap.lua
 priorities.lua
 engine.lua
 core.lua
-VersionStatus.lua
 VersionCheck.lua

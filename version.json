@@ -1,7 +1,7 @@
 {
   "addon": "RebuffedHealbot",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "interface": 30300,
   "repository": "https://github.com/Derfavo/RebuffedHealbot",
-  "release": "https://github.com/Derfavo/RebuffedHealbot/releases/tag/v0.6.4"
+  "release": "https://github.com/Derfavo/RebuffedHealbot/releases/tag/v0.6.5"
 }
