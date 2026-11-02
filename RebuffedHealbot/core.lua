@@ -1724,6 +1724,39 @@ addon.initializeSelfBuffReminder = function(parent)
         if type(d) == "number" or type(e) == "boolean" then return a,b,c,e,f,g end
         return a,b,c,d,e,f
     end
+    local function setGlow(row, active)
+        if row.glowing == active then return end
+        row.glowing = active
+        for _, texture in ipairs(row.alertEffects or {}) do
+            if active then
+                texture:SetAlpha(texture.baseAlpha)
+                texture:Show()
+                texture.pulse:Play()
+            else
+                texture.pulse:Stop()
+                texture:Hide()
+            end
+        end
+    end
+    local function makeEffect(row, path, size, point, x, y, base, change, duration)
+        local texture = row:CreateTexture(nil, "OVERLAY")
+        texture:SetTexture(path)
+        texture:SetWidth(size); texture:SetHeight(size)
+        texture:SetPoint(point, row, point, x, y)
+        texture:SetBlendMode("ADD")
+        texture:SetVertexColor(1, 0.75, 0.2)
+        texture.baseAlpha = base
+        texture:SetAlpha(base)
+        local group = texture:CreateAnimationGroup()
+        group:SetLooping("REPEAT")
+        local fadeIn = group:CreateAnimation("Alpha")
+        fadeIn:SetOrder(1); fadeIn:SetDuration(duration); fadeIn:SetChange(change)
+        local fadeOut = group:CreateAnimation("Alpha")
+        fadeOut:SetOrder(2); fadeOut:SetDuration(duration); fadeOut:SetChange(-change)
+        texture.pulse = group
+        texture:Hide()
+        row.alertEffects[#row.alertEffects + 1] = texture
+    end
     local function update(weaponsOnly)
         local dead = UnitIsDeadOrGhost("player")
         if not weaponsOnly then
@@ -1757,6 +1790,7 @@ addon.initializeSelfBuffReminder = function(parent)
                 local low = present and (entry.charges or entry.weapon) and count and count <= 1
                 local alert = not dead and eligible and (not present or low) or false
                 row.buffAlert = alert
+                setGlow(row, alert)
                 -- Every configured action has a visible 32px icon matching its
                 -- click area, including healthy buffs and combat.
                 row:SetAlpha(1)
@@ -1797,6 +1831,11 @@ addon.initializeSelfBuffReminder = function(parent)
         row.icon = row:CreateTexture(nil, "ARTWORK")
         row.icon:SetWidth(28); row.icon:SetHeight(28); row.icon:SetPoint("CENTER", 0, 0)
         row.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+        -- Native texture animations add no Lua ticker or additional click area.
+        row.alertEffects = {}
+        makeEffect(row, "Interface\\Buttons\\UI-ActionButton-Border", 54, "CENTER", 0, 0, 0.2, 0.65, 0.6)
+        makeEffect(row, "Interface\\Cooldown\\star4", 14, "TOPRIGHT", 4, 4, 0.05, 0.9, 0.35)
+        makeEffect(row, "Interface\\Cooldown\\star4", 12, "BOTTOMLEFT", -3, -3, 0.05, 0.9, 0.55)
         row:SetScript("OnEnter", function(self)
             if not self.entry then return end
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
@@ -1807,7 +1846,11 @@ addon.initializeSelfBuffReminder = function(parent)
             GameTooltip:Show()
         end)
         row:SetScript("OnLeave", function() GameTooltip:Hide() end)
-        row:SetScript("OnHide", function(self) if GameTooltip:IsOwned(self) then GameTooltip:Hide() end end)
+        row:SetScript("OnShow", function(self) setGlow(self, self.entry ~= nil and self.buffAlert == true) end)
+        row:SetScript("OnHide", function(self)
+            setGlow(self, false)
+            if GameTooltip:IsOwned(self) then GameTooltip:Hide() end
+        end)
         rows[index] = row
         return row
     end
@@ -1878,6 +1921,7 @@ addon.initializeSelfBuffReminder = function(parent)
         for index = count + 1, #rows do
             local row = rows[index]
             row.entry, row.buffAlert = nil, false
+            setGlow(row, false)
             if GameTooltip:IsOwned(row) then GameTooltip:Hide() end
             row:EnableMouse(false)
             row:SetAttribute("type1", nil); row:SetAlpha(0); row:Hide()

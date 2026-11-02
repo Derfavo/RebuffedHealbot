@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.6
+
+- Add a pulsing golden glow and twinkling sparks to missing or low-charge personal buffs.
+- Stop effects when the buff is restored or the warning no longer applies.
+- Keep the compact icon click areas and use native animations without another Lua ticker.
+
 ## 0.6.5
 
 - Replace the external checker with automatic version exchanges inside the game, following DBM's approach.

@@ -22,7 +22,7 @@ Skull and cross icons identify tanks and healers inside the healing frames. They
 
 A separate bar shows small buff icons that remain visible and clickable. The selection follows your class and the talent tree with the most points. Only learned spells are offered.
 
-A red border means a buff is missing or has only one charge left. Active buffs remain visible with a neutral border. Left-click to refresh the buff on yourself or apply the poison or weapon buff to its assigned weapon slot. The icons also work in combat. Outside combat, hold the right mouse button and drag an icon to move the entire bar independently of the healing frame.
+A red border, pulsing golden glow and two twinkling sparks mean a buff is missing or has only one charge left. The effects stop as soon as the buff is restored, while dead or when the reminder is no longer relevant. The glow does not enlarge the clickable area. Animations use the client's native animation system without an extra Lua update loop. Active buffs remain visible with a neutral border. Left-click to refresh the buff on yourself or apply the poison or weapon buff to its assigned weapon slot. The icons also work in combat. Outside combat, hold the right mouse button and drag an icon to move the entire bar independently of the healing frame.
 
 | Class | Examples |
 | --- | --- |
