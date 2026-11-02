@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.7
+
+- Prevent guild version messages when the character has no confirmed guild membership.
+- Handle numeric zero membership flags and wait for a nonempty guild name.
+- Recheck membership before sending a delayed message.
+
 ## 0.6.6
 
 - Add a pulsing golden glow and twinkling sparks to missing or low-charge personal buffs.
