@@ -662,6 +662,7 @@ end
 local function positionButton(button, index)
     local column = floor((index - 1) / config.rows)
     local row = (index - 1) % config.rows
+    button:ClearAllPoints()
     button:SetPoint("TOPLEFT", root, "TOPLEFT",
         8 + column * (config.width + config.gap), -40 - row * (config.height + config.gap))
 end
@@ -701,6 +702,34 @@ local function applyLayout()
     local count = raidCount > 0 and raidCount or GetNumPartyMembers() + 1
     local columns = math.ceil(count / config.rows)
     local rows = min(count, config.rows)
+    local raidPositions = {}
+    if raidCount > 0 then
+        local groupRows = {}
+        columns, rows = 1, 1
+        for index = 1, raidCount do
+            local group = rosterGroups["raid" .. index]
+                or select(3, GetRaidRosterInfo(index)) or 1
+            group = max(1, min(8, group))
+            groupRows[group] = (groupRows[group] or 0) + 1
+            -- Keep each secure button bound to its original raid unit. Only
+            -- move its position to the column belonging to its subgroup.
+            raidPositions[index] = (group - 1) * config.rows + groupRows[group]
+            columns = max(columns, group)
+            rows = max(rows, groupRows[group])
+        end
+    end
+    for index = 1, #buttons do
+        local button = buttons[index]
+        local raidIndex = tonumber(button.unit:match("^raid(%d+)$"))
+        local position
+        if raidIndex then
+            position = raidPositions[raidIndex] or raidIndex
+        else
+            local partyIndex = tonumber(button.unit:match("^party(%d+)$"))
+            position = partyIndex and partyIndex + 1 or 1
+        end
+        positionButton(button, position)
+    end
     root:SetSize(max(160, 16 + columns * config.width + (columns - 1) * config.gap),
         46 + rows * config.height + (rows - 1) * config.gap)
     root:SetScale(ChronixHealDB.scale)

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.8
+
+- Arrange raid frames by their actual raid subgroup, with one column per group.
+- Keep offline members in their group and preserve the order within each subgroup.
+- Apply group moves made during combat after combat ends.
+
 ## 0.6.7
 
 - Prevent guild version messages when the character has no confirmed guild membership.

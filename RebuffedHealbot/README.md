@@ -4,6 +4,8 @@ RebuffedHealbot displays your party or raid in healing frames for up to 40 playe
 
 ## Healing frames
 
+Raid columns follow the actual raid subgroups, from group 1 to group 8. Members stay in roster order within their subgroup, including offline players. Group moves made during combat appear after combat ends.
+
 The **S**, **M** and **F** buttons select Safe Mana, Mixed and Full Heal. Safe Mana favors economical healing, Mixed uses your configured thresholds, and Full Heal responds to smaller health deficits. You can switch modes in combat.
 
 Open settings through `…`, the minimap icon or **Interface → AddOns → RebuffedHealbot**. You can assign learned spells to click combinations outside combat. Bindings appear below each player's name and in the tooltip.
