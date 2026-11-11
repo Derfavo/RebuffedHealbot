@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.7.0
+
+- Add a separate WoW Forever client version alongside WoW 3.3.5a.
+- Add mouse buttons 4 and 5, wheel actions, twelve hover keys, targeted macro bindings and fixed spell ranks.
+- Add incoming-heal, absorb and supported HoT displays, mana-cost previews and a five-second indicator.
+- Add pet frames, a friendly-target frame, ready checks, raid markers and additional status indicators.
+- Add Quick Buff with recipient selection, group-buff thresholds and class/role blessing choices.
+- Add separate solo, party and raid layouts, growth corners, vertical groups, searchable settings and frame previews.
+- Keep existing 3.3.5a bindings, healing suggestions, tank controls and personal reminders.
+- Use native Forever displays for protected values. Exact remaining HoT amounts and the complete original-client personal reminder list are not available in the Forever version; see the README for client differences and optional prediction providers.
+
 ## 0.6.8
 
 - Arrange raid frames by their actual raid subgroup, with one column per group.

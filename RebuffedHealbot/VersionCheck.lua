@@ -1,4 +1,10 @@
-local addonName = ...
+local addonName, addon = ...
+local modern = addon and addon.forever == true
+local GetAddOnMetadata = modern and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
+local GetNumRaidMembers = modern and function() return IsInRaid() and GetNumGroupMembers() or 0 end or GetNumRaidMembers
+local GetNumPartyMembers = modern and GetNumSubgroupMembers or GetNumPartyMembers
+local SendAddonMessage = modern and C_ChatInfo.SendAddonMessage or SendAddonMessage
+local RegisterAddonMessagePrefix = modern and C_ChatInfo.RegisterAddonMessagePrefix or RegisterAddonMessagePrefix
 local manager = _G.RebuffedVersionChecks
 if not manager then
     manager = {addons = {}, installed = {}, pending = {}, lastSent = {}, candidates = {}, notified = {}}
@@ -116,7 +122,9 @@ if not manager then
         end
     end
     manager.receive = receive
-    for _,event in ipairs({"PLAYER_LOGIN","PARTY_MEMBERS_CHANGED","RAID_ROSTER_UPDATE","PLAYER_GUILD_UPDATE","CHAT_MSG_ADDON"}) do frame:RegisterEvent(event) end
+    local events = modern and {"PLAYER_LOGIN","GROUP_ROSTER_UPDATE","PLAYER_GUILD_UPDATE","CHAT_MSG_ADDON"}
+        or {"PLAYER_LOGIN","PARTY_MEMBERS_CHANGED","RAID_ROSTER_UPDATE","PLAYER_GUILD_UPDATE","CHAT_MSG_ADDON"}
+    for _,event in ipairs(events) do frame:RegisterEvent(event) end
     frame:SetScript("OnEvent",function(self,event,a,b,c,d)
         if event == "CHAT_MSG_ADDON" then
             if a == prefix then receive(b,c,d) end

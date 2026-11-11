@@ -119,6 +119,7 @@ local function spellLabel(key)
     local spell = getSpell(key)
     return spell and spell.name or locale("STR_NONE")
 end
+addon.suiteOriginalBinding = function(key) return findBinding(key), getSpell(key) end
 
 local function refreshSpells()
     if InCombatLockdown() then
@@ -271,6 +272,9 @@ local function refreshSpells()
     end
 
     pendingSpells = false
+    if addon.suite and addon.suite.root then
+        for _, button in ipairs(buttons) do addon.suite.ApplyBindings(button) end
+    end
 end
 
 local function updateAvailability()
@@ -558,7 +562,10 @@ local function showTooltip(button)
         local binding = bindings[index]
         local spell = getSpell(binding.key)
         local defaultCombo = binding.key == "naturewave" and spells.nature and spells.wave
-        if spell or defaultCombo then
+        local override = addon.suite and addon.suite.db and addon.suite.db.bindings[binding.prefix .. binding.button]
+        if override then
+            GameTooltip:AddDoubleLine(locale(binding.label), addon.suite.BindingDescription(override), 0.7, 0.8, 0.9, 1, 1, 1)
+        elseif spell or defaultCombo then
             GameTooltip:AddDoubleLine(locale(binding.label), spellLabel(binding.key), 0.7, 0.8, 0.9, 1, 1, 1)
         end
     end
@@ -695,6 +702,11 @@ end
 local function applyLayout()
     if InCombatLockdown() then
         pendingLayout = true
+        return
+    end
+
+    if addon.suiteLayout and addon.suiteLayout(root, buttons) then
+        pendingLayout = false
         return
     end
 
@@ -944,7 +956,7 @@ local function updateUnitState(button, now)
         and IsSpellInRange(spells.wave.name, unit) ~= 0 and true or false
 
     local expectedDeficit = (state.maximum - state.health + state.loss * 2) / state.maximum
-    if state.connected and not state.dead and expectedDeficit >= addon.getMode().groupDeficit
+    if not button.suiteKind and state.connected and not state.dead and expectedDeficit >= addon.getMode().groupDeficit
         and state.inRange ~= false then
         local group = rosterGroups[unit] or 1
         injuredGroups[group] = (injuredGroups[group] or 0) + 1
@@ -955,7 +967,7 @@ local function updateUnitState(button, now)
         readAuras(button)
     end
 
-    if state.connected and not state.dead and state.inRange ~= false then
+    if not button.suiteKind and state.connected and not state.dead and state.inRange ~= false then
         local remaining = state.loss > 0 and state.health / state.loss or math.huge
         if state.health / state.maximum <= config.criticalHealth or remaining < state.waveTime + 1 then
             anyDanger = true
@@ -1106,6 +1118,7 @@ local function updateGrid()
 
         if button:IsShown() and UnitExists(button.unit) then
             renderUnit(button)
+            if addon.suiteRender then addon.suiteRender(button) end
         end
     end
 
@@ -1218,7 +1231,7 @@ local function createGrid()
     settingsButton:SetText(locale("STR_SETTINGS_SHORT"))
     settingsButton:RegisterForClicks("LeftButtonUp")
     settingsButton:SetScript("OnClick", function()
-        addon.openSettings()
+        if addon.suite and addon.suite.db then addon.suite.OpenSettings() else addon.openSettings() end
     end)
     settingsButton:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
@@ -1317,6 +1330,7 @@ local function applyOptions()
         printMessage("STR_COMBAT")
         return false
     end
+    if addon.suite and addon.suite.root then addon.suite.Apply(); return true end
 
     for index = 1, #buttons do
         local button = buttons[index]
@@ -1440,14 +1454,17 @@ local function createSettingsActions()
 
             if key == "scale" then
                 ChronixHealDB.scale = value
+                if addon.suite and addon.suite.db then addon.suite.Profile().scale = value end
             elseif key == "unlocked" then
                 ChronixHealDB.unlocked = value
             elseif key == "visible" then
                 ChronixHealDB.hidden = not value
+                if addon.suite and addon.suite.db then addon.suite.db.showFrames = value and "always" or "never" end
                 if value then root:Show() else root:Hide() end
             else
                 config[key] = value
                 ChronixHealDB.options[key] = value
+                if (key == "width" or key == "height") and addon.suite and addon.suite.db then addon.suite.Profile()[key] = value end
 
             end
 
@@ -1510,6 +1527,8 @@ end
 
 local function handleCommand(message)
     local command, argument = message:match("^%s*(%S*)%s*(.-)%s*$")
+
+    if command == "" and addon.suite and addon.suite.db then addon.suite.OpenSettings(); return end
 
     if not initialized or string.lower(command or "") ~= "mode" then
         printMessage("STR_MODE_HELP")
@@ -1586,6 +1605,7 @@ local function initialize()
     updateRoster()
 
     addon.initializeSelfBuffReminder(root)
+    if addon.initializeSuite then addon.initializeSuite(root, buttons, createUnitButton, refreshSpells) end
 
     printMessage("STR_LOADED")
 

@@ -35,7 +35,7 @@ function addon.createMinimap()
         if mouse == "RightButton" then
             addon.settingsActions.restoreGrid()
         else
-            addon.openSettings()
+            if addon.suite and addon.suite.db then addon.suite.OpenSettings() else addon.openSettings() end
         end
     end)
     button:SetScript("OnEnter", function(self)

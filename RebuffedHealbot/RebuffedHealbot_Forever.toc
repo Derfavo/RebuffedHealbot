@@ -1,0 +1,15 @@
+## Interface: 16001
+## Title: RebuffedHealbot
+## Notes: Healing frames, click casting, hover keys and group buffs for WoW Forever.
+## Author: Chronix
+## Version: 0.7.0
+## X-Release-Date: 20261111
+## SavedVariables: ChronixHealDB, RebuffedHealbotVersionDB
+ForeverBootstrap.lua
+Suite.lua
+Display.lua
+Buffs.lua
+SuiteUI.lua
+Extras.lua
+Forever.lua
+VersionCheck.lua
