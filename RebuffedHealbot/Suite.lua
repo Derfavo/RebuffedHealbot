@@ -18,20 +18,27 @@ function S.Init()
     db.suite = type(db.suite) == "table" and db.suite or {}
     S.db = db.suite
     local defaults = {
-        showPets = true, showTarget = true, showFrames = "always", color = "class", healthText = "percent",
-        border = true, showTimers = true, showPrediction = true, showAbsorbs = true, showHotPrediction = true,
+        showPets = false, showTarget = true, showFrames = "always", color = "class", healthText = "percent",
+        border = true, showTimers = true, auraSize = 20, showPrediction = true, showAbsorbs = true, showHotPrediction = true,
         showFiveSecond = true, showManaCost = true, hideBlizzard = false, showBuffMarks = true,
         targetBuffs = true, thorns = "tanks", buffRefresh = 30, groupBuffThreshold = 3,
         quickKey = "", toggleKey = "", wheelUp = "MOUSEWHEELUP", wheelDown = "MOUSEWHEELDOWN", keys = {}, bindings = {}, blessings = {}, profiles = {}, welcomed = false,
     }
     for key, value in pairs(defaults) do if S.db[key] == nil then S.db[key] = copy(value) end end
+    S.db.showPets = false
     for _, kind in ipairs({"solo", "party", "raid"}) do
         local profile = S.db.profiles[kind] or {}
         local base = {width = addon.config and addon.config.width or 128, height = addon.config and addon.config.height or 52,
             scale = db.scale or 1, grow = "TOPLEFT", vertical = false, x = db.x or 0, y = db.y or 0}
         for key, value in pairs(base) do if profile[key] == nil then profile[key] = value end end
+        profile.height = math.max(profile.height, S.RequiredFrameHeight(profile))
         S.db.profiles[kind] = profile
     end
+end
+function S.RequiredFrameHeight(profile)
+    local size = math.max(16, math.min(28, tonumber(S.db.auraSize) or 20))
+    local columns = math.max(1, math.floor((profile.width - 6) / (size + 2)))
+    return 36 + math.ceil(9 / columns) * (size + 2)
 end
 function S.GroupType()
     if S.modern then
@@ -243,6 +250,7 @@ end
 function S.Position(root, buttons)
     if not S.db or InCombatLockdown() then return false end
     local p = S.Profile()
+    p.height = math.max(p.height, S.RequiredFrameHeight(p))
     local counts, highest, mostRows = {}, 1, 1
     local raid = S.GroupType() == "raid"
     local normal, pets, positions = {}, {}, {}

@@ -67,9 +67,6 @@ local function initialize()
     unitButton("player", "[group:raid]hide;show")
     for i = 1, 4 do local unit = "party" .. i; unitButton(unit, "[group:raid]hide;[@" .. unit .. ",exists]show;hide") end
     for i = 1, 40 do local unit = "raid" .. i; unitButton(unit, "[group:raid,@" .. unit .. ",exists]show;hide") end
-    unitButton("pet", "[nogroup:raid,@pet,exists]show;hide", "pet", "player")
-    for i = 1, 4 do unitButton("partypet" .. i, "[nogroup:raid,@partypet" .. i .. ",exists]show;hide", "pet", "party" .. i) end
-    for i = 1, 40 do unitButton("raidpet" .. i, "[group:raid,@raidpet" .. i .. ",exists]show;hide", "pet", "raid" .. i) end
     unitButton("target", "[@target,help,exists]show;hide", "target")
     S.Start(root, S.buttons); defaults(); S.Apply()
     for _, b in ipairs(S.buttons) do refresh(b, true) end

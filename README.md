@@ -15,11 +15,13 @@ For GitHub's Source code ZIP, use the addon folder inside the archive, not the o
 
 Open `/rhb`, the header settings button or the minimap icon. Search finds options across all pages. Solo, party and raid layouts have separate width, height, scale, position, growth corner and group direction. The preview cycles through 5, 10, 20 and 40 sample players.
 
-Raid frames follow the actual subgroups and roster order, including offline members. Pets have smaller frames aligned with their owners in a separate bank. An optional frame shows a friendly target. You can limit visibility to a group type and hide Blizzard's group frames while the addon grid is visible.
+Raid frames follow the actual subgroups and roster order, including offline members. Companions are not included in the healing grid. An optional frame shows a friendly target. You can limit visibility to a group type and hide Blizzard's group frames while the addon grid is visible.
 
 Drag the header outside combat to move the current layout. On Forever you can also drag it while Edit Mode is open; size and growth remain in `/rhb`. The grid is a separate addon frame, not a registered Blizzard Edit Mode system.
 
 Frames show health, mana, aura timers, range fading, threat borders, a target outline, actual raid markers, ready checks and supported resurrection/summon status. Health can use class colors, green or a gradient, with percentage, absolute or missing-health text.
+
+Buff and debuff icons default to 20 pixels. Set their size under Frames; the grid wraps them into rows and reserves enough height to keep them clear of names and mana bars. Timers use outlined text above the cooldown animation. Forever uses the client's own countdown numbers without changing your global cooldown settings.
 
 ## Clicks, keys and macros
 

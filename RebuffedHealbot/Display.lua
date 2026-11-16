@@ -8,6 +8,13 @@ local function bar(parent, color)
     value:SetMinMaxValues(0, 1); value:SetValue(0)
     return value
 end
+local function timerText(expiration)
+    local seconds = expiration and expiration > 0 and math.max(0, math.ceil(expiration - GetTime())) or 0
+    if not S.db.showTimers or seconds == 0 then return "" end
+    if seconds >= 3600 then return math.ceil(seconds / 3600) .. "h" end
+    if seconds >= 60 then return math.ceil(seconds / 60) .. "m" end
+    return tostring(seconds)
+end
 function S.AttachDisplay(button, health)
     if button.suiteDisplay then return end
     button.suiteDisplay = true
@@ -69,8 +76,17 @@ function S.AttachDisplay(button, health)
         icon:SetPoint("BOTTOMLEFT", 3 + (i - 1) * 13, 8)
         icon.texture = icon:CreateTexture(nil, "ARTWORK"); icon.texture:SetAllPoints()
         icon.cooldown = CreateFrame("Cooldown", nil, icon, "CooldownFrameTemplate"); icon.cooldown:SetAllPoints()
-        icon.count = icon:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall"); icon.count:SetPoint("BOTTOMRIGHT")
-        icon.timer = icon:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall"); icon.timer:SetPoint("TOP")
+        -- Text must be above the child cooldown frame, not just above the icon texture.
+        icon.labels = CreateFrame("Frame", nil, icon); icon.labels:SetAllPoints()
+        icon.labels:SetFrameLevel(icon.cooldown:GetFrameLevel() + 2)
+        icon.count = icon.labels:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall"); icon.count:SetPoint("TOPRIGHT", 1, 0)
+        icon.timer = icon.labels:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall"); icon.timer:SetPoint("BOTTOM", 0, 0)
+        if S.modern then
+            icon.cooldown:SetCountdownFont("GameFontHighlightSmall")
+            icon.cooldown:SetMinimumCountdownDuration(0)
+            icon.nativeTimer = icon.cooldown:GetCountdownFontString()
+            icon.nativeTimer:ClearAllPoints(); icon.nativeTimer:SetPoint("BOTTOM", 0, 0)
+        end
         button.suiteAuras[i] = icon
     end
     if S.modern and CreateUnitHealPredictionCalculator then
@@ -90,8 +106,20 @@ function S.DisplaysSize(button)
     end
     if button.actionText then button.actionText:SetWidth(math.max(20, width - 47)) end
     if button.costOverlay then button.costOverlay:SetSize(width, 6) end
-    local size = math.max(6, math.min(12, math.floor((width - 6) / 9)))
-    for i, icon in ipairs(button.suiteAuras) do icon:SetSize(size, size); icon:ClearAllPoints(); icon:SetPoint("BOTTOMLEFT", 3 + (i - 1) * (size + 1), 8) end
+    local wanted = math.max(16, math.min(28, tonumber(S.db.auraSize) or 20))
+    local rows = math.max(1, math.floor((profile.height - 36) / (wanted + 2)))
+    local columns = math.ceil(#button.suiteAuras / rows)
+    local size = math.min(wanted, math.floor((width - 6) / columns) - 2)
+    columns = math.max(1, math.floor((width - 6) / (size + 2)))
+    for i, icon in ipairs(button.suiteAuras) do
+        icon:SetSize(size, size); icon:ClearAllPoints()
+        icon:SetPoint("BOTTOMLEFT", 3 + ((i - 1) % columns) * (size + 2), 8 + math.floor((i - 1) / columns) * (size + 2))
+        icon.count:SetFont("Fonts\\FRIZQT__.TTF", math.max(8, math.min(10, size * .4)), "OUTLINE")
+        local fontSize = math.max(9, math.min(13, size * .6))
+        icon.timer:SetFont("Fonts\\FRIZQT__.TTF", fontSize, "OUTLINE")
+        icon.timer:SetTextColor(1, 1, 1, 1)
+        if icon.nativeTimer then icon.nativeTimer:SetFont("Fonts\\FRIZQT__.TTF", fontSize, "OUTLINE"); icon.nativeTimer:SetTextColor(1, 1, 1, 1) end
+    end
 end
 function S.Predictions(button)
     local unit, maximum = button.unit, UnitHealthMax(button.unit)
@@ -167,6 +195,7 @@ function S.Auras(button)
                     local duration = C_UnitAuras.GetAuraDuration(button.unit, aura.auraInstanceID)
                     if duration then icon.cooldown:SetCooldownFromDurationObject(duration); icon.cooldown:Show() else icon.cooldown:Hide() end
                 else icon.cooldown:Hide() end
+                icon.cooldown:SetHideCountdownNumbers(not S.db.showTimers)
                 icon.timer:SetText(""); icon:Show(); slot = slot + 1
                 end
             end
@@ -193,9 +222,8 @@ function S.Auras(button)
                     if not icon then break end
                     local count, duration, expiration = aura.count, aura.duration, aura.expiration
                     icon.texture:SetTexture(aura.texture); icon.count:SetText(count and count > 1 and count or "")
-                    local seconds = expiration and expiration > 0 and math.max(0, math.ceil(expiration - GetTime())) or 0
                     icon.expiration = expiration
-                    icon.timer:SetText(S.db.showTimers and seconds > 0 and seconds or "")
+                    icon.timer:SetText(timerText(expiration))
                     if S.db.showTimers and duration and duration > 0 and expiration then icon.cooldown:SetCooldown(expiration - duration, duration); icon.cooldown:Show() else icon.cooldown:Hide() end
                     icon:Show(); slot = slot + 1
             end
@@ -210,7 +238,7 @@ function S.UpdateAuraTimers(button)
     button.suiteTimerSecond = math.floor(now)
     for _, icon in ipairs(button.suiteAuras) do
         if icon.expiration and icon.expiration > 0 then
-            icon.timer:SetText(S.db.showTimers and math.max(0, math.ceil(icon.expiration - now)) or "")
+            icon.timer:SetText(timerText(icon.expiration))
         end
     end
 end

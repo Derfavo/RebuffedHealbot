@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.1
+
+- Increase buff and debuff icons to 20 pixels by default and add an icon-size setting.
+- Wrap aura icons into rows and reserve enough frame height for them.
+- Keep outlined timer and stack text above the cooldown animation and enable Forever countdown numbers explicitly.
+- Remove companion frames from both client versions, including previously enabled companion settings.
+
 ## 0.7.0
 
 - Add a separate WoW Forever client version alongside WoW 3.3.5a.

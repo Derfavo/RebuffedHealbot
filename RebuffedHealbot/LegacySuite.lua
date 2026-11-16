@@ -20,19 +20,8 @@ addon.suiteRender = function(button)
 end
 addon.initializeSuite = function(root, buttons, createButton, refreshSpells)
     S.Init()
-    createButton("pet", 1, "[group:raid]hide;[@pet,exists]show;hide"); buttons[#buttons].suiteKind, buttons[#buttons].suiteOwner = "pet", "player"
-    for i = 1, 4 do
-        local unit = "partypet" .. i
-        createButton(unit, 1, "[group:raid]hide;[@" .. unit .. ",exists]show;hide")
-        buttons[#buttons].suiteKind, buttons[#buttons].suiteOwner = "pet", "party" .. i
-    end
-    for i = 1, 40 do
-        local unit = "raidpet" .. i
-        createButton(unit, 1, "[group:raid,@" .. unit .. ",exists]show;hide")
-        buttons[#buttons].suiteKind, buttons[#buttons].suiteOwner = "pet", "raid" .. i
-    end
     createButton("target", 1, "[@target,help,exists]show;hide"); buttons[#buttons].suiteKind = "target"
-    -- New secure buttons need the same original class defaults as the existing grid.
+    -- The target button needs the same original class defaults as the existing grid.
     refreshSpells()
     for _, button in ipairs(buttons) do S.AttachDisplay(button, button.health) end
     S.Start(root, buttons)

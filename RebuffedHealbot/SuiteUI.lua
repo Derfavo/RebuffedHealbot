@@ -153,10 +153,10 @@ function S.OpenSettings()
     local pages = {{"frames", "Frames"}, {"layout", "Layout"}, {"bindings", S.Text("Klicks", "Clicks")}, {"keys", S.Text("Tasten", "Keys")}, {"buffs", "Buffs"}}
     for i, entry in ipairs(pages) do local key = entry[1]; button(panel, entry[2], 130, 18 + (i - 1) * 138, -45, function() page = key; search:SetText(""); refresh() end) end
     option(S.Text("Frames anzeigen", "Show frames"), "showFrames", {{"always", "Always"}, {"solo", "Solo"}, {"party", "Party"}, {"raid", "Raid"}, {"never", "Never"}})
-    check(S.Text("Begleiter anzeigen", "Show pets"), "showPets")
     check(S.Text("Freundliches Ziel anzeigen", "Show friendly target"), "showTarget")
     option(S.Text("Lebensfarbe", "Health color"), "color", {{"class", "Class"}, {"green", "Green"}, {"gradient", "Gradient"}})
     option(S.Text("Gesundheitstext", "Health text"), "healthText", {{"percent", "%"}, {"missing", "Missing"}, {"absolute", "Absolute"}, {"none", "Off"}})
+    option(S.Text("Buff-/Debuff-Icongr\195\182\195\159e", "Buff/debuff icon size"), "auraSize", {{16, "16"}, {18, "18"}, {20, "20"}, {22, "22"}, {24, "24"}, {28, "28"}})
     for _, entry in ipairs({{"Incoming healing", "showPrediction"}, {"Remaining own HoT healing", "showHotPrediction"}, {"Absorb shields", "showAbsorbs"}, {"Aura timers", "showTimers"}, {"Mana cost preview", "showManaCost"}, {"Five-second rule", "showFiveSecond"}, {"Frame border", "border"}, {"Hide Blizzard group frames", "hideBlizzard"}}) do
         if not S.modern or entry[2] ~= "showHotPrediction" then check(entry[1], entry[2]) end
     end
@@ -165,7 +165,7 @@ function S.OpenSettings()
     text(row, S.Text("Layout bearbeiten", "Edit layout"), 0, -5); row.refresh = function() select:SetText(selectedProfile) end; rows[#rows + 1] = row
     local sizes = {}; for n = 80, 220, 10 do sizes[#sizes + 1] = {n, tostring(n)} end
     option(S.Text("Breite", "Width"), "width", sizes, "profile", "layout")
-    local heights = {}; for n = 36, 100, 4 do heights[#heights + 1] = {n, tostring(n)} end
+    local heights = {}; for n = 36, 160, 4 do heights[#heights + 1] = {n, tostring(n)} end
     option(S.Text("H\195\182he", "Height"), "height", heights, "profile", "layout")
     local scales = {}; for n = 5, 20 do scales[#scales + 1] = {n / 10, n * 10 .. "%"} end
     option(S.Text("Skalierung", "Scale"), "scale", scales, "profile", "layout")
